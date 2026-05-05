@@ -1,0 +1,54 @@
+{
+  "goals": [
+    {
+      "id": 1,
+      "text": "Define ideal Deal 1 criteria",
+      "done": false,
+      "category": "business",
+      "createdAt": "2026-05-02"
+    },
+    {
+      "id": 2,
+      "text": "GCC C-corp \u2192 S-corp conversion this year",
+      "done": false,
+      "category": "business",
+      "createdAt": "2026-05-02"
+    },
+    {
+      "id": 3,
+      "text": "15 clean pull-ups by Dec 25, 2026",
+      "done": false,
+      "category": "fitness",
+      "createdAt": "2026-05-02"
+    },
+    {
+      "id": 4,
+      "text": "Pistol squats by Dec 25, 2026",
+      "done": false,
+      "category": "fitness",
+      "createdAt": "2026-05-02"
+    },
+    {
+      "id": 5,
+      "text": "Muscle-up by Dec 25, 2027",
+      "done": false,
+      "category": "fitness",
+      "createdAt": "2026-05-02"
+    },
+    {
+      "id": 6,
+      "text": "Credit 740+ FICO by 2029-2030",
+      "done": false,
+      "category": "personal",
+      "createdAt": "2026-05-02"
+    },
+    {
+      "id": 7,
+      "text": "Family Compound complete Feb 25, 2032",
+      "done": false,
+      "category": "endgame",
+      "createdAt": "2026-05-02"
+    }
+  ],
+  "nextId": 8
+}

@@ -1,0 +1,42 @@
+{
+  "entries": [
+    {
+      "date": "2026-05-01",
+      "status": "yes",
+      "notes": "Boys trip / sauna session. 50 push-ups (in sauna), 20 bench dips (lean-back), 30 bicycle crunches (slow clean form), ~20 V-ups to failure (full body extension to pike). Abs sore through Mon."
+    },
+    {
+      "date": "2026-05-03",
+      "status": "yes",
+      "notes": "Airport travel day. 90 clean lunges. Quads sore Mon."
+    },
+    {
+      "date": "2026-05-04",
+      "status": "yes",
+      "notes": "Warm-up / activation only. 2 sets of 5 pull-ups (reps 4-5 form-break each set). Dead hang stretch for back. Not a real programmed session.",
+      "prs": {
+        "pullups": 5
+      }
+    }
+  ],
+  "targets": [
+    {
+      "id": "pullups",
+      "label": "Pull-ups",
+      "target": "15 clean",
+      "deadline": "2026-12-25"
+    },
+    {
+      "id": "pistol-squats",
+      "label": "Pistol squats",
+      "target": "Both legs",
+      "deadline": "2026-12-25"
+    },
+    {
+      "id": "muscle-up",
+      "label": "Muscle-up",
+      "target": "1 clean",
+      "deadline": "2027-12-25"
+    }
+  ]
+}
