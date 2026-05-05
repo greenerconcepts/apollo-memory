@@ -1,3 +1,892 @@
 <!DOCTYPE html>
-<html><head><meta charset="utf-8"><title>Apollo CC</title></head>
-<body><h1>Apollo Command Center</h1><p>Initializing...</p></body></html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="CC">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#0A332D">
+<link rel="manifest" href="manifest.json">
+<title>Max — Command Center</title>
+<style>
+  :root {
+    color-scheme: light;
+    --green: #157061;
+    --green-dark: #0F4D43;
+    --green-deep: #0A332D;
+    --green-soft: #F0F7F5;
+    --green-badge-bg: #E6F0EE;
+    --rust: #B85C2E;
+    --rust-bg: #FAEFE8;
+    --page-bg: #EEECE5;
+    --card-bg: #FFFFFF;
+    --beige: #F4F2EC;
+    --border: rgba(0,0,0,0.12);
+    --border-strong: rgba(0,0,0,0.25);
+    --text: #1A1A1A;
+    --text-muted: #6B6B6B;
+    --text-subtle: #999;
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body {
+    margin: 0; padding: 0;
+    background: var(--page-bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 14px;
+    -webkit-font-smoothing: antialiased;
+    overscroll-behavior-y: contain;
+  }
+  #app { padding: 1rem; max-width: 720px; margin: 0 auto; padding-bottom: 4rem; }
+  @supports (padding: env(safe-area-inset-top)) {
+    #app {
+      padding-top: max(1rem, env(safe-area-inset-top));
+      padding-bottom: max(4rem, env(safe-area-inset-bottom));
+    }
+  }
+  #auth {
+    max-width: 420px; margin: 4rem auto; padding: 2rem;
+    background: var(--card-bg); border-radius: 12px;
+    border: 0.5px solid var(--border);
+  }
+  #auth h1 { margin: 0 0 8px; font-size: 22px; font-weight: 500; color: var(--green-deep); }
+  #auth p { margin: 0 0 16px; font-size: 13px; color: var(--text-muted); line-height: 1.5; }
+  #auth input {
+    width: 100%; font-size: 13px; padding: 10px 12px;
+    border: 0.5px solid var(--border); border-radius: 8px;
+    font-family: ui-monospace, Menlo, monospace;
+    background: var(--beige);
+    margin-bottom: 12px;
+  }
+  #auth button {
+    width: 100%; padding: 12px; border-radius: 8px;
+    background: var(--green); color: #FFF; border: none;
+    font-size: 14px; font-weight: 500; cursor: pointer;
+  }
+  #auth .err { color: var(--rust); font-size: 12px; margin-top: 8px; min-height: 14px; }
+  .header {
+    display: flex; justify-content: space-between; align-items: baseline;
+    margin-bottom: 1rem; padding-bottom: 12px;
+    border-bottom: 0.5px solid var(--border);
+  }
+  .header h1 { margin: 0; font-size: 18px; font-weight: 500; }
+  .header .today { margin: 4px 0 0; font-size: 12px; color: var(--text-muted); }
+  .header .deal-label {
+    margin: 0; font-size: 10px; color: var(--text-subtle);
+    letter-spacing: 0.5px; text-transform: uppercase;
+  }
+  .header .deal-days { margin: 2px 0 0; font-size: 22px; font-weight: 500; color: var(--green); }
+  .sync {
+    display: flex; align-items: center; gap: 8px;
+    background: var(--green-soft);
+    border: 0.5px solid var(--green-badge-bg);
+    border-radius: 8px; padding: 6px 10px;
+    margin-bottom: 12px;
+    font-size: 11px; color: var(--green-dark);
+  }
+  .sync .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); }
+  .sync.busy .dot { background: #C39E2A; }
+  .sync.error { background: var(--rust-bg); border-color: var(--rust); color: var(--rust); }
+  .sync.error .dot { background: var(--rust); }
+  .card {
+    background: var(--card-bg); border: 0.5px solid var(--border);
+    border-radius: 12px; padding: 1rem; margin-bottom: 1rem;
+  }
+  .card-accent-green {
+    background: var(--card-bg);
+    border-left: 3px solid var(--green);
+    border-top: 0.5px solid var(--border);
+    border-right: 0.5px solid var(--border);
+    border-bottom: 0.5px solid var(--border);
+    border-radius: 0; padding: 1rem;
+    margin-bottom: 1rem;
+  }
+  .card-header {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 12px;
+  }
+  .card-header h3 { margin: 0; font-size: 14px; font-weight: 500; }
+  .card-header .meta { font-size: 11px; color: var(--text-subtle); }
+  .item-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px; }
+  .goal-item {
+    display: flex; align-items: center; gap: 10px; font-size: 13px;
+    padding: 6px 0;
+  }
+  .goal-item input[type=checkbox] {
+    cursor: pointer; accent-color: var(--green);
+    width: 18px; height: 18px;
+  }
+  .goal-item .label { flex: 1; }
+  .goal-item .label.done { text-decoration: line-through; color: var(--text-subtle); }
+  .empty { margin: 0; font-size: 12px; color: var(--text-subtle); font-style: italic; }
+  .row { display: flex; gap: 8px; align-items: stretch; }
+  .row input[type=text], .row input[type=number], .row select {
+    flex: 1; font-size: 14px; padding: 10px 12px;
+    border: 0.5px solid var(--border); border-radius: 8px;
+    background: #FFFFFF; outline: none;
+    font-family: inherit; color: var(--text);
+    -webkit-appearance: none;
+  }
+  textarea { width: 100%; min-height: 80px; padding: 10px 12px; resize: vertical; font-family: inherit; font-size: 14px; border: 0.5px solid var(--border); border-radius: 8px; background: #FFF; outline: none; }
+  input:focus, textarea:focus, select:focus { border-color: var(--green); }
+  button {
+    font-family: inherit; cursor: pointer; font-size: 14px;
+    padding: 10px 16px; border-radius: 8px;
+    border: 0.5px solid var(--border-strong);
+    background: transparent; color: var(--text);
+    -webkit-appearance: none;
+  }
+  button:active { opacity: 0.7; }
+  button.primary { background: var(--green); color: #FFF; border: none; }
+  button.small {
+    font-size: 11px; padding: 4px 10px;
+    border: 0.5px solid var(--border); color: var(--text-muted);
+  }
+  .logged-row {
+    display: flex; align-items: center; gap: 10px;
+    background: #FFFFFF;
+    border: 0.5px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 12px;
+    margin-bottom: 8px;
+  }
+  .logged-row .lbl {
+    font-size: 10px; color: var(--text-subtle);
+    text-transform: uppercase; letter-spacing: 0.5px;
+    min-width: 80px;
+  }
+  .logged-row .val { flex: 1; font-size: 13px; color: var(--text-muted); font-weight: 500; }
+  .input-block { margin-bottom: 10px; }
+  .input-block label { display: block; font-size: 11px; color: var(--text-muted); margin-bottom: 4px; }
+  .tabs {
+    display: flex; gap: 4px; margin-bottom: 12px;
+    border-bottom: 0.5px solid var(--border);
+    overflow-x: auto;
+  }
+  .tab {
+    padding: 8px 12px; border: none; background: transparent;
+    color: var(--text-muted); font-size: 13px; cursor: pointer;
+    border-bottom: 2px solid transparent; border-radius: 0;
+    margin-bottom: -1px; flex-shrink: 0;
+  }
+  .tab.active { color: var(--green); border-bottom-color: var(--green); font-weight: 500; }
+  .journal-nav { display: flex; align-items: center; gap: 6px; margin-bottom: 12px; }
+  .journal-nav input[type="date"] {
+    font-size: 12px; padding: 4px 8px;
+    border: 0.5px solid var(--border); border-radius: 6px;
+    background: #FFFFFF; color: var(--text);
+  }
+  .journal-nav button {
+    font-size: 11px; padding: 4px 10px;
+    border: 0.5px solid var(--border); background: #FFF;
+    color: var(--text-muted);
+  }
+  .journal-entries {
+    display: flex; flex-direction: column; gap: 10px;
+    margin-bottom: 12px; max-height: 320px; overflow-y: auto;
+  }
+  .journal-entry { padding: 10px 12px; background: var(--beige); border-radius: 8px; }
+  .journal-entry .meta {
+    display: flex; justify-content: space-between;
+    font-size: 11px; color: var(--text-subtle);
+    margin-bottom: 4px;
+  }
+  .journal-entry p { margin: 0; font-size: 13px; line-height: 1.5; white-space: pre-wrap; }
+  .metrics {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 8px; margin-top: 1rem;
+  }
+  .metric { background: var(--green); color: #FFF; border-radius: 8px; padding: 12px; cursor: pointer; }
+  .metric .label { margin: 0; font-size: 11px; color: #C7E5DC; letter-spacing: 0.3px; text-transform: uppercase; }
+  .metric .value { margin: 4px 0 0; font-size: 16px; font-weight: 500; color: #FFF; }
+  .save-row { display: flex; justify-content: flex-end; margin-top: 8px; }
+  .atlas-checkin { background: var(--green-soft); border-radius: 8px; padding: 12px; margin-bottom: 12px; }
+  .atlas-checkin h4 { margin: 0 0 10px; font-size: 13px; color: var(--green-dark); font-weight: 500; }
+  .calisthenics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 8px; margin-bottom: 8px;
+  }
+  .cal-item { padding: 10px; background: var(--green-soft); border-radius: 8px; }
+  .cal-item .name { margin: 0; font-size: 11px; color: var(--green-dark); }
+  .cal-item .target { margin: 2px 0 0; font-size: 13px; font-weight: 500; color: var(--green-deep); }
+  .cal-item .pr { margin: 4px 0 0; font-size: 10px; color: var(--text-muted); }
+  .mwf-pill {
+    display: inline-block; padding: 3px 8px; border-radius: 999px;
+    font-size: 10px; font-weight: 500; letter-spacing: 0.3px;
+    margin-left: 8px;
+  }
+  .mwf-pill.on { background: var(--green); color: #FFF; }
+  .mwf-pill.off { background: var(--green-badge-bg); color: var(--green-dark); }
+  .badge-atlas {
+    background: var(--green); color: #FFF; font-size: 10px;
+    padding: 2px 6px; border-radius: 4px;
+    letter-spacing: 0.5px; text-transform: uppercase;
+    margin-left: 8px;
+  }
+  .section-h { margin: 0 0 12px; font-size: 14px; font-weight: 500; display: flex; align-items: center; }
+  .skeleton {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: skeleton 1.4s ease-in-out infinite;
+    border-radius: 4px;
+    height: 14px; margin: 4px 0;
+  }
+  @keyframes skeleton {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+  }
+  .footer-actions {
+    display: flex; gap: 8px; margin-top: 16px;
+    justify-content: center; flex-wrap: wrap;
+  }
+  .footer-actions button {
+    font-size: 11px; padding: 4px 10px;
+    background: transparent; border: 0.5px solid var(--border);
+    color: var(--text-subtle);
+  }
+</style>
+</head>
+<body>
+
+<div id="auth" style="display:none;">
+  <h1>Apollo CC</h1>
+  <p>Paste your GitHub fine-grained PAT to log in. It's stored only on this device (localStorage) and used for direct GitHub API calls — never sent anywhere else.</p>
+  <input type="password" id="pat-input" placeholder="github_pat_..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+  <button id="pat-submit">Log in</button>
+  <p class="err" id="auth-err"></p>
+</div>
+
+<div id="app" style="display:none;">
+  <div class="sync" id="sync-bar">
+    <span class="dot"></span>
+    <span id="sync-text">Loading…</span>
+  </div>
+
+  <div class="header">
+    <div>
+      <h1>Max — command center</h1>
+      <p class="today" id="today-date">—</p>
+    </div>
+    <div style="text-align: right;">
+      <p class="deal-label">Days to Deal 1</p>
+      <p class="deal-days" id="days-to-deal1">—</p>
+    </div>
+  </div>
+
+  <div class="card-accent-green">
+    <div class="card-header">
+      <h3>Goals</h3>
+      <span class="meta" id="goals-meta">—</span>
+    </div>
+    <div class="item-list" id="goals-list">
+      <div class="skeleton"></div><div class="skeleton"></div>
+    </div>
+    <div class="row">
+      <input type="text" id="goal-input" placeholder="Add a goal…">
+      <button class="primary" id="add-goal-btn">Add</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3 class="section-h">
+      Atlas <span class="badge-atlas">Trainer</span>
+      <span id="mwf-status"></span>
+    </h3>
+    <div class="atlas-checkin">
+      <h4>Today's check-in</h4>
+      <div id="weight-row"></div>
+      <div id="pullup-row"></div>
+      <div id="workout-row"></div>
+    </div>
+    <h4 style="margin: 12px 0 8px; font-size: 12px; color: var(--green-dark); font-weight: 500;">Calisthenics targets</h4>
+    <div class="calisthenics-grid" id="cal-grid"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <h3>Journal</h3>
+      <span class="meta" id="journal-meta">—</span>
+    </div>
+    <div class="journal-nav">
+      <button id="journal-prev">‹</button>
+      <input type="date" id="journal-date">
+      <button id="journal-next">›</button>
+      <button id="journal-today-btn">Today</button>
+    </div>
+    <div class="tabs" id="journal-tabs">
+      <button class="tab active" data-channel="personal">Personal</button>
+      <button class="tab" data-channel="business">Business</button>
+      <button class="tab" data-channel="ideas">Ideas</button>
+      <button class="tab" data-channel="fitness">Fitness</button>
+    </div>
+    <div class="journal-entries" id="journal-entries"></div>
+    <div id="journal-composer">
+      <textarea id="journal-input" placeholder="What happened? What did you learn? What's on your mind?"></textarea>
+      <div class="save-row">
+        <button class="primary" id="save-journal-btn">Save entry</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="metrics" id="metrics-strip">
+    <div class="metric" data-key="deal1"><p class="label">Deal 1</p><p class="value">Dec 25, 2026</p></div>
+    <div class="metric" data-key="deal2"><p class="label">Deal 2</p><p class="value">Summer 2027</p></div>
+    <div class="metric" data-key="compound"><p class="label">Compound</p><p class="value">Feb 25, 2032</p></div>
+  </div>
+
+  <div class="footer-actions">
+    <button id="reload-btn">Reload</button>
+    <button id="logout-btn">Log out</button>
+  </div>
+</div>
+
+<script>
+"use strict";
+
+const OWNER = "greenerconcepts";
+const REPO = "apollo-memory";
+const BRANCH = "main";
+const API = "https://api.github.com/repos/" + OWNER + "/" + REPO + "/contents";
+
+const PAT_KEY = "apollo_pat";
+function getPAT() { return localStorage.getItem(PAT_KEY); }
+function setPAT(t) { localStorage.setItem(PAT_KEY, t); }
+function clearPAT() { localStorage.removeItem(PAT_KEY); }
+
+async function validatePAT(token) {
+  const res = await fetch("https://api.github.com/repos/" + OWNER + "/" + REPO, {
+    headers: { Authorization: "Bearer " + token, Accept: "application/vnd.github+json" }
+  });
+  return res.ok;
+}
+
+const fileCache = {};
+
+async function ghGet(path) {
+  const token = getPAT();
+  const res = await fetch(API + "/" + path + "?ref=" + BRANCH, {
+    headers: { Authorization: "Bearer " + token, Accept: "application/vnd.github+json" }
+  });
+  if (res.status === 404) {
+    fileCache[path] = { sha: null, text: "" };
+    return { sha: null, text: "" };
+  }
+  if (!res.ok) throw new Error("GET " + path + " -> " + res.status);
+  const data = await res.json();
+  const bin = atob(data.content.replace(/\n/g, ""));
+  const bytes = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+  const decoded = new TextDecoder().decode(bytes);
+  fileCache[path] = { sha: data.sha, text: decoded };
+  return { sha: data.sha, text: decoded };
+}
+
+async function ghPut(path, text, message) {
+  const token = getPAT();
+  const cached = fileCache[path];
+  const bytes = new TextEncoder().encode(text);
+  let bin = "";
+  for (let i = 0; i < bytes.length; i++) bin += String.fromCharCode(bytes[i]);
+  const content = btoa(bin);
+  const body = { message: message || ("update " + path), content, branch: BRANCH };
+  if (cached && cached.sha) body.sha = cached.sha;
+  const res = await fetch(API + "/" + path, {
+    method: "PUT",
+    headers: {
+      Authorization: "Bearer " + token,
+      Accept: "application/vnd.github+json",
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(body)
+  });
+  if (!res.ok) {
+    const errBody = await res.text();
+    throw new Error("PUT " + path + " -> " + res.status + ": " + errBody.slice(0, 200));
+  }
+  const data = await res.json();
+  fileCache[path] = { sha: data.content.sha, text };
+  return data;
+}
+
+async function readJson(path, fallback) {
+  try {
+    const { text } = await ghGet(path);
+    if (!text) return fallback;
+    return JSON.parse(text);
+  } catch (e) {
+    console.error("readJson", path, e);
+    return fallback;
+  }
+}
+
+async function writeJson(path, obj, message) {
+  await ghPut(path, JSON.stringify(obj, null, 2) + "\n", message);
+}
+
+const state = {
+  goals: { goals: [], nextId: 1 },
+  blockers: { blockers: [], nextId: 1 },
+  weights: { entries: [] },
+  workouts: { entries: [], targets: [] },
+  profile: null,
+  journalChannel: "personal",
+  journalDate: null,
+  journalEntries: {},
+  editing: { weight: false, pullup: false, workout: false }
+};
+
+const DEAL_1 = new Date("2026-12-25T00:00:00");
+function todayISO() {
+  const d = new Date();
+  return d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2,"0") + "-" + String(d.getDate()).padStart(2,"0");
+}
+function nowHHMM() {
+  const d = new Date();
+  return String(d.getHours()).padStart(2,"0") + ":" + String(d.getMinutes()).padStart(2,"0");
+}
+function daysUntil(date) {
+  return Math.max(0, Math.ceil((date.getTime() - Date.now()) / 86400000));
+}
+function todayLong() {
+  return new Date().toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" });
+}
+function isMWF() {
+  const d = new Date().getDay();
+  return d === 1 || d === 3 || d === 5;
+}
+function activeJournalDate() {
+  return state.journalDate || todayISO();
+}
+
+function setSync(text, kind) {
+  const bar = document.getElementById("sync-bar");
+  bar.className = "sync" + (kind ? " " + kind : "");
+  document.getElementById("sync-text").textContent = text;
+}
+
+function escapeHtml(s) {
+  return String(s == null ? "" : s)
+    .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+}
+
+function renderHeader() {
+  document.getElementById("today-date").textContent = todayLong();
+  document.getElementById("days-to-deal1").textContent = daysUntil(DEAL_1);
+}
+
+function renderGoals() {
+  const list = document.getElementById("goals-list");
+  const meta = document.getElementById("goals-meta");
+  const goals = state.goals.goals || [];
+  meta.textContent = goals.filter(g => !g.done).length + " active";
+  if (goals.length === 0) {
+    list.innerHTML = '<p class="empty">No goals yet.</p>';
+    return;
+  }
+  list.innerHTML = "";
+  for (const g of goals) {
+    const row = document.createElement("div");
+    row.className = "goal-item";
+    row.innerHTML =
+      '<input type="checkbox" ' + (g.done ? "checked" : "") + ' data-id="' + g.id + '" class="goal-toggle">' +
+      '<span class="label ' + (g.done ? "done" : "") + '">' + escapeHtml(g.text) + '</span>' +
+      '<button class="small goal-delete" data-id="' + g.id + '">×</button>';
+    list.appendChild(row);
+  }
+  list.querySelectorAll(".goal-toggle").forEach(el =>
+    el.addEventListener("change", e => toggleGoal(parseInt(e.target.dataset.id, 10)))
+  );
+  list.querySelectorAll(".goal-delete").forEach(el =>
+    el.addEventListener("click", e => deleteGoal(parseInt(e.target.dataset.id, 10)))
+  );
+}
+
+function renderCheckin() {
+  const today = todayISO();
+  const wt = (state.weights.entries || []).find(e => e.date === today);
+  const wkRow = document.getElementById("weight-row");
+  if (wt && !state.editing.weight) {
+    wkRow.innerHTML =
+      '<div class="logged-row">' +
+        '<span class="lbl">Weight</span>' +
+        '<span class="val">' + wt.weight + ' lbs ' +
+          (wt.when ? '<span style="font-weight:400; color:var(--text-subtle); font-size:11px;">· ' + escapeHtml(wt.when) + '</span>' : '') +
+        '</span>' +
+        '<button class="small" id="edit-weight-btn">edit</button>' +
+      '</div>';
+    document.getElementById("edit-weight-btn").addEventListener("click", () => {
+      state.editing.weight = true; renderCheckin();
+    });
+  } else {
+    wkRow.innerHTML =
+      '<div class="input-block">' +
+        '<label>Weight (lbs)</label>' +
+        '<div class="row">' +
+          '<input type="number" id="weight-input" step="0.1" inputmode="decimal" placeholder="e.g. 178.5" value="' + (wt ? wt.weight : '') + '">' +
+          '<button class="primary" id="save-weight-btn">Save</button>' +
+        '</div>' +
+      '</div>';
+    document.getElementById("save-weight-btn").addEventListener("click", saveWeight);
+  }
+  const wkout = (state.workouts.entries || []).find(e => e.date === today);
+  const pullup = wkout && wkout.prs && wkout.prs.pullups;
+  const puRow = document.getElementById("pullup-row");
+  if (pullup != null && !state.editing.pullup) {
+    puRow.innerHTML =
+      '<div class="logged-row">' +
+        '<span class="lbl">Pull-up max</span>' +
+        '<span class="val">' + pullup + ' reps</span>' +
+        '<button class="small" id="edit-pullup-btn">edit</button>' +
+      '</div>';
+    document.getElementById("edit-pullup-btn").addEventListener("click", () => {
+      state.editing.pullup = true; renderCheckin();
+    });
+  } else {
+    puRow.innerHTML =
+      '<div class="input-block">' +
+        '<label>Pull-up max (reps)</label>' +
+        '<div class="row">' +
+          '<input type="number" id="pullup-input" step="1" min="0" inputmode="numeric" placeholder="e.g. 8" value="' + (pullup != null ? pullup : '') + '">' +
+          '<button class="primary" id="save-pullup-btn">Save</button>' +
+        '</div>' +
+      '</div>';
+    document.getElementById("save-pullup-btn").addEventListener("click", savePullup);
+  }
+  const wkRow2 = document.getElementById("workout-row");
+  const has = wkout && (wkout.status || wkout.notes);
+  if (has && !state.editing.workout) {
+    const status = wkout.status || "—";
+    const notes = wkout.notes || "";
+    const preview = notes ? notes.split("\n")[0].slice(0, 50) : "";
+    wkRow2.innerHTML =
+      '<div class="logged-row">' +
+        '<span class="lbl">Workout</span>' +
+        '<span class="val">' + escapeHtml(status) +
+          (preview ? '<span style="color:var(--text-subtle); font-size:11px; margin-left:6px;">· ' + escapeHtml(preview) + '</span>' : '') +
+        '</span>' +
+        '<button class="small" id="edit-workout-btn">edit</button>' +
+      '</div>';
+    document.getElementById("edit-workout-btn").addEventListener("click", () => {
+      state.editing.workout = true; renderCheckin();
+    });
+  } else {
+    const cur = wkout || {};
+    wkRow2.innerHTML =
+      '<div class="input-block">' +
+        '<label>Did you work out?</label>' +
+        '<select id="workout-did" style="width:100%;">' +
+          '<option value="" ' + (!cur.status ? "selected" : "") + '>—</option>' +
+          '<option value="yes" ' + (cur.status === "yes" ? "selected" : "") + '>Yes</option>' +
+          '<option value="rest" ' + (cur.status === "rest" ? "selected" : "") + '>Rest day</option>' +
+          '<option value="skip" ' + (cur.status === "skip" ? "selected" : "") + '>Skipped</option>' +
+        '</select>' +
+      '</div>' +
+      '<div class="input-block">' +
+        '<label>Notes</label>' +
+        '<textarea id="workout-notes" placeholder="3x8 pull-ups, 3x10 push-ups, felt strong…">' + escapeHtml(cur.notes || "") + '</textarea>' +
+        '<div class="save-row">' +
+          '<button class="primary" id="save-workout-btn">Save workout</button>' +
+        '</div>' +
+      '</div>';
+    document.getElementById("save-workout-btn").addEventListener("click", saveWorkout);
+  }
+}
+
+function renderAtlas() {
+  document.getElementById("mwf-status").innerHTML = isMWF()
+    ? '<span class="mwf-pill on">MWF</span>'
+    : '<span class="mwf-pill off">Off</span>';
+  const grid = document.getElementById("cal-grid");
+  const targets = state.workouts.targets || [];
+  if (targets.length === 0) {
+    grid.innerHTML = '<p class="empty">No targets set.</p>';
+  } else {
+    grid.innerHTML = "";
+    for (const t of targets) {
+      let best = null;
+      for (const e of (state.workouts.entries || [])) {
+        if (e.prs && e.prs[t.id] && (best == null || e.prs[t.id] > best)) best = e.prs[t.id];
+      }
+      const item = document.createElement("div");
+      item.className = "cal-item";
+      item.innerHTML =
+        '<p class="name">' + escapeHtml(t.label) + '</p>' +
+        '<p class="target">' + escapeHtml(t.target) + '</p>' +
+        '<p class="pr">' + (best ? "Best: " + best : "No PR logged") + '</p>';
+      grid.appendChild(item);
+    }
+  }
+}
+
+function renderJournal() {
+  const date = activeJournalDate();
+  const channel = state.journalChannel;
+  const isToday = date === todayISO();
+  const meta = document.getElementById("journal-meta");
+  const composer = document.getElementById("journal-composer");
+  const list = document.getElementById("journal-entries");
+  const dateInput = document.getElementById("journal-date");
+  if (dateInput.value !== date) dateInput.value = date;
+  if (composer) composer.style.display = isToday ? "" : "none";
+  const key = date + "|" + channel;
+  const entries = state.journalEntries[key];
+  if (entries === undefined) {
+    list.innerHTML = '<p class="empty">Loading…</p>';
+    meta.textContent = date + " · " + channel;
+    loadJournalEntries(date, channel).then(() => renderJournal());
+    return;
+  }
+  if (entries === null) {
+    list.innerHTML = '<p class="empty">No ' + channel + ' entries on ' + date + '.</p>';
+    meta.textContent = "0 entries · " + date + " · " + channel;
+    return;
+  }
+  meta.textContent = entries.length + " " + (entries.length === 1 ? "entry" : "entries") + " · " + date + " · " + channel;
+  if (entries.length === 0) {
+    list.innerHTML = '<p class="empty">No ' + channel + ' entries on ' + date + '.</p>';
+    return;
+  }
+  list.innerHTML = "";
+  for (const e of entries.slice().reverse()) {
+    const row = document.createElement("div");
+    row.className = "journal-entry";
+    row.innerHTML =
+      '<div class="meta"><span>' + escapeHtml(e.time || "") + '</span><span>' + date + '</span></div>' +
+      '<p>' + escapeHtml(e.text) + '</p>';
+    list.appendChild(row);
+  }
+}
+
+function shiftJournalDate(delta) {
+  const cur = new Date(activeJournalDate() + "T00:00:00");
+  cur.setDate(cur.getDate() + delta);
+  const next = cur.getFullYear() + "-" + String(cur.getMonth()+1).padStart(2,"0") + "-" + String(cur.getDate()).padStart(2,"0");
+  state.journalDate = next === todayISO() ? null : next;
+  renderJournal();
+}
+
+async function loadAll() {
+  setSync("Loading…", "busy");
+  try {
+    const [goals, blockers, weights, workouts, profile] = await Promise.all([
+      readJson("data/goals.json", { goals: [], nextId: 1 }),
+      readJson("data/blockers.json", { blockers: [], nextId: 1 }),
+      readJson("data/fitness/weights.json", { entries: [] }),
+      readJson("data/fitness/workouts.json", { entries: [], targets: [] }),
+      readJson("data/profile.json", null)
+    ]);
+    state.goals = goals;
+    state.blockers = blockers;
+    state.weights = weights;
+    state.workouts = workouts;
+    state.profile = profile;
+    renderHeader();
+    renderGoals();
+    renderCheckin();
+    renderAtlas();
+    renderJournal();
+    setSync("Synced", "");
+  } catch (e) {
+    setSync("Error: " + e.message, "error");
+    throw e;
+  }
+}
+
+async function loadJournalEntries(date, channel) {
+  const path = "data/journal/" + channel + "/" + date + ".md";
+  try {
+    const r = await ghGet(path);
+    const text = r.text;
+    if (!text) {
+      state.journalEntries[date + "|" + channel] = null;
+      return;
+    }
+    const blocks = text.split(/^---\s*$/m).map(b => b.trim()).filter(Boolean);
+    const entries = [];
+    for (const b of blocks) {
+      const m = b.match(/^##\s+(\d{1,2}:\d{2})\s*\n+([\s\S]*)$/);
+      if (m) entries.push({ time: m[1], text: m[2].trim() });
+      else if (b.trim() && !b.startsWith("# Journal")) entries.push({ time: "", text: b.trim() });
+    }
+    state.journalEntries[date + "|" + channel] = entries;
+  } catch (e) {
+    state.journalEntries[date + "|" + channel] = null;
+  }
+}
+
+async function withSync(label, fn) {
+  setSync(label, "busy");
+  try { await fn(); setSync("Synced", ""); }
+  catch (e) { setSync("Error: " + e.message, "error"); console.error(e); }
+}
+
+async function addGoal() {
+  const input = document.getElementById("goal-input");
+  const text = input.value.trim();
+  if (!text) return;
+  const id = state.goals.nextId || 1;
+  state.goals.goals.push({ id, text, done: false, category: "personal", createdAt: todayISO() });
+  state.goals.nextId = id + 1;
+  input.value = "";
+  renderGoals();
+  await withSync("Saving goal…", () => writeJson("data/goals.json", state.goals, "add goal: " + text));
+}
+
+async function toggleGoal(id) {
+  const g = state.goals.goals.find(x => x.id === id);
+  if (!g) return;
+  g.done = !g.done;
+  renderGoals();
+  await withSync("Saving…", () => writeJson("data/goals.json", state.goals, "toggle goal " + id));
+}
+
+async function deleteGoal(id) {
+  state.goals.goals = state.goals.goals.filter(x => x.id !== id);
+  renderGoals();
+  await withSync("Saving…", () => writeJson("data/goals.json", state.goals, "delete goal " + id));
+}
+
+async function saveWeight() {
+  const v = parseFloat(document.getElementById("weight-input").value);
+  if (isNaN(v) || v <= 0) return;
+  const date = todayISO();
+  state.weights.entries = state.weights.entries.filter(e => e.date !== date);
+  state.weights.entries.push({ date, weight: v, when: nowHHMM() });
+  state.weights.entries.sort((a, b) => a.date.localeCompare(b.date));
+  state.editing.weight = false;
+  renderCheckin();
+  await withSync("Saving weight…", () => writeJson("data/fitness/weights.json", state.weights, "weight " + v + " lbs"));
+}
+
+async function savePullup() {
+  const v = parseInt(document.getElementById("pullup-input").value, 10);
+  if (isNaN(v) || v < 0) return;
+  const date = todayISO();
+  let entry = state.workouts.entries.find(e => e.date === date);
+  if (!entry) { entry = { date }; state.workouts.entries.push(entry); }
+  entry.prs = entry.prs || {};
+  entry.prs.pullups = v;
+  state.workouts.entries.sort((a, b) => a.date.localeCompare(b.date));
+  state.editing.pullup = false;
+  renderCheckin(); renderAtlas();
+  await withSync("Saving pull-up max…", () => writeJson("data/fitness/workouts.json", state.workouts, "pull-up max " + v));
+}
+
+async function saveWorkout() {
+  const did = document.getElementById("workout-did").value;
+  const notes = document.getElementById("workout-notes").value.trim();
+  const date = todayISO();
+  let entry = state.workouts.entries.find(e => e.date === date);
+  if (!entry) { entry = { date }; state.workouts.entries.push(entry); }
+  entry.status = did;
+  entry.notes = notes;
+  state.workouts.entries.sort((a, b) => a.date.localeCompare(b.date));
+  state.editing.workout = false;
+  renderCheckin();
+  await withSync("Saving workout…", () => writeJson("data/fitness/workouts.json", state.workouts, "log workout"));
+}
+
+async function saveJournal() {
+  const date = activeJournalDate();
+  if (date !== todayISO()) return;
+  const text = document.getElementById("journal-input").value.trim();
+  if (!text) return;
+  const channel = state.journalChannel;
+  const time = nowHHMM();
+  const path = "data/journal/" + channel + "/" + date + ".md";
+  setSync("Saving entry…", "busy");
+  try {
+    let body = "";
+    try { const r = await ghGet(path); body = r.text || ""; } catch (e) {}
+    if (!body) body = "# Journal — " + channel + " — " + date + "\n\n";
+    body += "## " + time + "\n\n" + text + "\n\n---\n\n";
+    await ghPut(path, body, "journal entry · " + channel + " · " + time);
+    document.getElementById("journal-input").value = "";
+    state.journalEntries[date + "|" + channel] = undefined;
+    renderJournal();
+    setSync("Synced", "");
+  } catch (e) {
+    setSync("Error: " + e.message, "error");
+  }
+}
+
+function switchChannel(channel) {
+  state.journalChannel = channel;
+  document.querySelectorAll("#journal-tabs .tab").forEach(t => {
+    t.classList.toggle("active", t.dataset.channel === channel);
+  });
+  renderJournal();
+}
+
+function showAuth(err) {
+  document.getElementById("app").style.display = "none";
+  document.getElementById("auth").style.display = "";
+  if (err) document.getElementById("auth-err").textContent = err;
+  else document.getElementById("auth-err").textContent = "";
+}
+
+function showApp() {
+  document.getElementById("auth").style.display = "none";
+  document.getElementById("app").style.display = "";
+}
+
+document.getElementById("pat-submit").addEventListener("click", async () => {
+  const t = document.getElementById("pat-input").value.trim();
+  if (!t) return;
+  document.getElementById("auth-err").textContent = "Validating…";
+  const ok = await validatePAT(t).catch(() => false);
+  if (!ok) { document.getElementById("auth-err").textContent = "Invalid token or no access to repo."; return; }
+  setPAT(t);
+  showApp();
+  await loadAll();
+  wireApp();
+});
+
+function wireApp() {
+  document.getElementById("add-goal-btn").addEventListener("click", addGoal);
+  document.getElementById("goal-input").addEventListener("keydown", e => {
+    if (e.key === "Enter") addGoal();
+  });
+  document.getElementById("save-journal-btn").addEventListener("click", saveJournal);
+  document.querySelectorAll("#journal-tabs .tab").forEach(t =>
+    t.addEventListener("click", () => switchChannel(t.dataset.channel))
+  );
+  document.getElementById("journal-prev").addEventListener("click", () => shiftJournalDate(-1));
+  document.getElementById("journal-next").addEventListener("click", () => shiftJournalDate(1));
+  document.getElementById("journal-today-btn").addEventListener("click", () => {
+    state.journalDate = null;
+    renderJournal();
+  });
+  document.getElementById("journal-date").addEventListener("change", e => {
+    const v = e.target.value;
+    state.journalDate = (v && v !== todayISO()) ? v : null;
+    renderJournal();
+  });
+  document.getElementById("reload-btn").addEventListener("click", () => location.reload());
+  document.getElementById("logout-btn").addEventListener("click", () => {
+    if (confirm("Clear PAT and log out of this device?")) {
+      clearPAT(); location.reload();
+    }
+  });
+}
+
+(async function() {
+  const t = getPAT();
+  if (!t) { showAuth(); return; }
+  const ok = await validatePAT(t).catch(() => false);
+  if (!ok) { clearPAT(); showAuth("Stored token is invalid or expired."); return; }
+  showApp();
+  try {
+    await loadAll();
+    wireApp();
+  } catch (e) {
+    setSync("Failed to load: " + e.message, "error");
+  }
+})();
+</script>
+</body>
+</html>

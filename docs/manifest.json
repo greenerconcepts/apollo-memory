@@ -1,0 +1,12 @@
+{
+  "name": "Apollo Command Center",
+  "short_name": "CC",
+  "description": "Max's daily command center",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#EEECE5",
+  "theme_color": "#0A332D",
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml" }
+  ]
+}
