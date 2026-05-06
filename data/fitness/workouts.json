@@ -17,6 +17,12 @@
       "prs": {
         "pullups": 5
       }
+    },
+    {
+      "date": "2026-05-06",
+      "prs": {
+        "pullups": 4
+      }
     }
   ],
   "targets": [
