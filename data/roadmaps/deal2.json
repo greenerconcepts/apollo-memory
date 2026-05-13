@@ -1,0 +1,20 @@
+{
+  "title": "Deal 2 — Second Spec Home",
+  "target_date": "2027-08-15",
+  "status": "planned",
+  "summary": "Second spec home, summer 2027. Built off Deal 1 lessons. Capital recycled from Deal 1 profits where possible.",
+  "phases": [
+    { "label": "Deal 1 closed and profits documented", "done": false },
+    { "label": "Deal 1 lessons captured (margin, timeline, mistakes, wins)", "done": false },
+    { "label": "Deal 2 criteria refined based on Deal 1 results", "done": false },
+    { "label": "Lender relationship from Deal 1 carried forward or improved", "done": false },
+    { "label": "Lot under contract", "done": false },
+    { "label": "Build", "done": false },
+    { "label": "Sold", "done": false }
+  ],
+  "action_items": [
+    { "label": "Defer all detail planning until Deal 1 closes", "done": false }
+  ],
+  "risks": "Don't start Deal 2 planning before Deal 1 is in the ground. Splitting attention kills both.",
+  "notes": "Locked behind Deal 1. Treat this roadmap as a stub until Deal 1 ships."
+}

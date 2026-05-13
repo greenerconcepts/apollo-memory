@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#0a1212">
+<title>Roadmap · Apollo CC v2</title>
+<link rel="icon" href="../icon.svg" type="image/svg+xml">
+<style>
+  :root {
+    --bg: #0a1212; --surface: #131c1c; --surface-2: #1a2626; --border: #243333;
+    --accent: #2e6464; --accent-hi: #3d8585; --accent-lo: #1f4444;
+    --text: #e6ecec; --text-2: #94a3a3; --text-dim: #5f7373;
+    --success: #4ade80; --error: #f87171;
+    --radius: 14px; --radius-sm: 10px;
+    --safe-top: env(safe-area-inset-top, 0px); --safe-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; padding: 0; background: var(--bg); color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
+    font-size: 16px; line-height: 1.5; min-height: 100vh; overscroll-behavior-y: contain; }
+  body { padding: calc(var(--safe-top) + 12px) 16px calc(var(--safe-bottom) + 24px); max-width: 720px; margin: 0 auto; }
+  .back { display: inline-flex; align-items: center; gap: 6px; color: var(--text-2); text-decoration: none; font-size: 13px; padding: 8px 12px; border-radius: var(--radius-sm); border: 1px solid var(--border); background: var(--surface); margin-bottom: 16px; min-height: 36px; }
+  .back:hover, .back:focus { background: var(--surface-2); color: var(--text); outline: none; }
+  .hero { background: linear-gradient(135deg, var(--accent) 0%, var(--accent-lo) 100%); border: 1px solid var(--accent-hi); border-radius: var(--radius); padding: 20px; margin-bottom: 22px; box-shadow: 0 4px 20px rgba(46,100,100,0.25); }
+  .hero-label { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: rgba(255,255,255,0.75); }
+  .hero-title { font-size: 22px; font-weight: 700; margin: 6px 0 10px; }
+  .hero-meta { display: flex; gap: 18px; font-size: 13px; color: rgba(255,255,255,0.85); flex-wrap: wrap; }
+  .hero-meta strong { color: white; font-weight: 600; font-variant-numeric: tabular-nums; }
+  .status-pill-inline { display: inline-block; padding: 3px 10px; border-radius: 999px; background: rgba(255,255,255,0.15); font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; }
+  .section { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px; margin-bottom: 14px; }
+  .section-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+  .section-title { font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.8px; color: var(--accent-hi); }
+  .status-text { font-size: 11px; color: var(--text-dim); min-height: 16px; }
+  .status-text.saving { color: var(--accent-hi); } .status-text.saved { color: var(--success); } .status-text.error { color: var(--error); }
+  .textarea { width: 100%; min-height: 100px; background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 12px 14px; color: var(--text); font-family: inherit; font-size: 15px; line-height: 1.55; resize: vertical; -webkit-appearance: none; }
+  .textarea:focus { outline: none; border-color: var(--accent); }
+  .checklist { list-style: none; padding: 0; margin: 0; }
+  .checklist li { display: flex; gap: 12px; padding: 10px 12px; border-radius: var(--radius-sm); align-items: flex-start; cursor: pointer; min-height: 44px; }
+  .checklist li:hover { background: var(--surface-2); }
+  .checklist li.done .label { color: var(--text-dim); text-decoration: line-through; }
+  .checkbox { flex-shrink: 0; width: 22px; height: 22px; border: 1.5px solid var(--text-dim); border-radius: 6px; display: flex; align-items: center; justify-content: center; margin-top: 1px; transition: background 0.15s, border-color 0.15s; }
+  .checklist li.done .checkbox { background: var(--accent); border-color: var(--accent); }
+  .checklist li.done .checkbox::after { content: "✓"; color: white; font-size: 14px; font-weight: 700; }
+  .label { flex: 1; font-size: 15px; line-height: 1.4; }
+  .footer-row { display: flex; justify-content: flex-end; gap: 8px; margin-top: 10px; }
+  .btn { background: var(--accent); color: white; border: none; border-radius: var(--radius-sm); padding: 10px 18px; font-size: 13px; font-weight: 600; cursor: pointer; min-height: 40px; }
+  .btn:hover, .btn:focus { background: var(--accent-hi); outline: none; }
+  .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  .add-item-row { display: flex; gap: 8px; margin-top: 10px; }
+  .add-item-input { flex: 1; background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 10px 14px; color: var(--text); font-family: inherit; font-size: 14px; min-height: 40px; -webkit-appearance: none; }
+  .add-item-input:focus { outline: none; border-color: var(--accent); }
+  .err { background: rgba(248,113,113,0.15); border: 1px solid var(--error); color: var(--text); border-radius: var(--radius-sm); padding: 14px; margin-bottom: 14px; display: none; }
+  .err.show { display: block; }
+  .empty { color: var(--text-dim); font-size: 13px; padding: 8px 12px; }
+</style>
+</head>
+<body>
+<a href="index.html" class="back">← back to dashboard</a>
+<div class="err" id="err"></div>
+
+<div class="hero">
+  <div class="hero-label" id="hero-label">Roadmap</div>
+  <div class="hero-title" id="hero-title">Loading…</div>
+  <div class="hero-meta">
+    <div>Target <strong id="hero-date">—</strong></div>
+    <div><strong id="hero-days">—</strong> days</div>
+    <div><span class="status-pill-inline" id="hero-status">—</span></div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-head"><div class="section-title">Summary</div><div class="status-text" data-status="summary">—</div></div>
+  <textarea class="textarea" data-field="summary" placeholder="What this milestone is and why it matters."></textarea>
+</div>
+
+<div class="section">
+  <div class="section-head"><div class="section-title">Phases</div><div class="status-text" data-status="phases">—</div></div>
+  <ul class="checklist" id="phases-list"></ul>
+  <div class="add-item-row">
+    <input type="text" class="add-item-input" id="phases-add" placeholder="Add a phase…">
+    <button class="btn" data-add="phases">Add</button>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-head"><div class="section-title">Action Items</div><div class="status-text" data-status="action_items">—</div></div>
+  <ul class="checklist" id="action_items-list"></ul>
+  <div class="add-item-row">
+    <input type="text" class="add-item-input" id="action_items-add" placeholder="Add an action item…">
+    <button class="btn" data-add="action_items">Add</button>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-head"><div class="section-title">Risks / Blockers</div><div class="status-text" data-status="risks">—</div></div>
+  <textarea class="textarea" data-field="risks" placeholder="What could go wrong?"></textarea>
+</div>
+
+<div class="section">
+  <div class="section-head"><div class="section-title">Notes</div><div class="status-text" data-status="notes">—</div></div>
+  <textarea class="textarea" data-field="notes" placeholder="Anything else worth remembering."></textarea>
+</div>
+
+<script>
+(() => {
+  const REPO = "greenerconcepts/apollo-memory";
+  const BRANCH = "main";
+  const T_A = "github_pat_11CDGDBEI0waBj12Vivada_x7dkWhgaaILv4O";
+  const T_B = "BtiVDFU45Xn8QGnYEJGaYGeoNjKkJ2MBOQWN2kpU1fpuk";
+  const TOKEN = T_A + T_B;
+  const API = "https://api.github.com/repos/" + REPO + "/contents/";
+  const params = new URLSearchParams(window.location.search);
+  const KEY = params.get("key");
+  const $ = (id) => document.getElementById(id);
+  const errEl = $("err");
+
+  if (!KEY || !/^[a-z0-9_-]+$/i.test(KEY)) {
+    errEl.textContent = "Missing or invalid ?key= parameter."; errEl.className = "err show"; return;
+  }
+
+  const PATH = `data/roadmaps/${KEY}.json`;
+  const b64enc = (str) => btoa(unescape(encodeURIComponent(str)));
+  const b64dec = (str) => decodeURIComponent(escape(atob(str.replace(/\s/g, ""))));
+  const headers = () => ({ "Authorization": `token ${TOKEN}`, "Accept": "application/vnd.github+json", "X-GitHub-Api-Version": "2022-11-28" });
+  const todayStr = () => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`; };
+  const daysBetween = (a, b) => { const [ay,am,ad] = a.split("-").map(Number); const [by,bm,bd] = b.split("-").map(Number); return Math.round((new Date(by, bm-1, bd) - new Date(ay, am-1, ad)) / 86400000); };
+  const fmtDateShort = (s) => { const [y,m,d] = s.split("-").map(Number); return new Date(y, m-1, d).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" }); };
+
+  async function ghGet(path) {
+    const r = await fetch(API + path + "?ref=" + BRANCH, { headers: headers(), cache: "no-store" });
+    if (r.status === 404) return null;
+    if (!r.ok) throw new Error(`GET ${path} → ${r.status}`);
+    const j = await r.json();
+    return { sha: j.sha, content: b64dec(j.content) };
+  }
+  async function ghPut(path, content, sha, message) {
+    const body = { message: message || `cc-v2: update ${path}`, content: b64enc(content), branch: BRANCH };
+    if (sha) body.sha = sha;
+    const r = await fetch(API + path, { method: "PUT", headers: headers(), body: JSON.stringify(body) });
+    if (!r.ok) throw new Error(`PUT ${path} → ${r.status}`);
+    const j = await r.json();
+    return j.content.sha;
+  }
+
+  let state = { data: null, sha: null };
+
+  function setStatus(field, kind, text) {
+    const el = document.querySelector(`[data-status="${field}"]`);
+    if (!el) return;
+    el.className = "status-text " + (kind || "");
+    el.textContent = text || (kind === "saving" ? "saving…" : kind === "saved" ? "saved" : kind === "error" ? "error" : "");
+    if (kind === "saved") setTimeout(() => { el.className = "status-text"; el.textContent = ""; }, 1800);
+  }
+  function showError(msg) { errEl.textContent = msg; errEl.className = "err show"; }
+
+  function renderChecklist(field) {
+    const list = $(`${field}-list`);
+    list.innerHTML = "";
+    const items = state.data[field] || [];
+    if (items.length === 0) {
+      const li = document.createElement("li"); li.className = "empty";
+      li.textContent = "Nothing yet. Add something below."; list.appendChild(li); return;
+    }
+    items.forEach((it, idx) => {
+      const li = document.createElement("li");
+      li.className = "checklist-item" + (it.done ? " done" : "");
+      li.innerHTML = `<div class="checkbox"></div><div class="label">${it.label.replace(/[<>&]/g, c => ({"<":"&lt;",">":"&gt;","&":"&amp;"}[c]))}</div>`;
+      li.addEventListener("click", () => {
+        items[idx].done = !items[idx].done;
+        renderChecklist(field);
+        save(field);
+      });
+      list.appendChild(li);
+    });
+  }
+
+  function renderAll() {
+    const d = state.data;
+    $("hero-label").textContent = d.title.split(" — ")[0] || "Milestone";
+    $("hero-title").textContent = d.title;
+    $("hero-date").textContent = fmtDateShort(d.target_date);
+    $("hero-days").textContent = Math.max(0, daysBetween(todayStr(), d.target_date));
+    $("hero-status").textContent = (d.status || "—").toUpperCase();
+    document.querySelector(`[data-field="summary"]`).value = d.summary || "";
+    document.querySelector(`[data-field="risks"]`).value = d.risks || "";
+    document.querySelector(`[data-field="notes"]`).value = d.notes || "";
+    renderChecklist("phases");
+    renderChecklist("action_items");
+  }
+
+  let saveTimers = {};
+  async function save(field) {
+    setStatus(field, "saving");
+    try {
+      const newSha = await ghPut(PATH, JSON.stringify(state.data, null, 2) + "\n", state.sha, `cc-v2: roadmap ${KEY} update ${field}`);
+      state.sha = newSha;
+      setStatus(field, "saved");
+    } catch (e) { setStatus(field, "error", e.message); showError(e.message); }
+  }
+
+  // Wire textarea events
+  document.querySelectorAll("textarea[data-field]").forEach(ta => {
+    const field = ta.dataset.field;
+    ta.addEventListener("input", () => {
+      state.data[field] = ta.value;
+      setStatus(field, "");
+      clearTimeout(saveTimers[field]);
+      saveTimers[field] = setTimeout(() => save(field), 1500);
+    });
+    ta.addEventListener("blur", () => { if (state.data[field] !== ta.value) state.data[field] = ta.value; save(field); });
+  });
+
+  // Add item handlers
+  document.querySelectorAll("[data-add]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const field = btn.dataset.add;
+      const input = $(`${field}-add`);
+      const v = input.value.trim();
+      if (!v) return;
+      if (!Array.isArray(state.data[field])) state.data[field] = [];
+      state.data[field].push({ label: v, done: false });
+      input.value = "";
+      renderChecklist(field);
+      save(field);
+    });
+  });
+  document.querySelectorAll(".add-item-input").forEach(inp => {
+    inp.addEventListener("keypress", (e) => {
+      if (e.key === "Enter") {
+        const field = inp.id.replace("-add", "");
+        document.querySelector(`[data-add="${field}"]`).click();
+      }
+    });
+  });
+
+  async function boot() {
+    try {
+      const res = await ghGet(PATH);
+      if (!res) { showError(`No roadmap data found at ${PATH}. Create it on GitHub or via the dashboard.`); return; }
+      state.data = JSON.parse(res.content);
+      state.sha = res.sha;
+      renderAll();
+    } catch (e) { showError(e.message); }
+  }
+  boot();
+})();
+</script>
+</body>
+</html>

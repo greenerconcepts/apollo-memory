@@ -4,9 +4,36 @@
   "tz": "America/New_York",
   "business": "Greener Concepts Construction",
   "milestones": [
-    { "key": "deal1", "label": "Deal 1", "date": "2026-12-25", "name": "First spec home" },
-    { "key": "deal2", "label": "Deal 2", "date": "2027-08-15", "name": "Second spec" },
-    { "key": "compound", "label": "Compound", "date": "2032-02-25", "name": "Family compound — 45th birthday" }
+    {
+      "key": "deal1",
+      "label": "Deal 1",
+      "date": "2026-12-25",
+      "name": "First spec home"
+    },
+    {
+      "key": "credit",
+      "label": "Credit",
+      "date": "2026-10-01",
+      "name": "Credit score ready for construction loan"
+    },
+    {
+      "key": "deal2",
+      "label": "Deal 2",
+      "date": "2027-08-15",
+      "name": "Second spec"
+    },
+    {
+      "key": "compound",
+      "label": "Compound",
+      "date": "2032-02-25",
+      "name": "Family compound \u2014 45th birthday"
+    }
   ],
-  "brand": { "green": "#157061", "greenDark": "#0F4D43", "greenDeep": "#0A332D", "rust": "#B85C2E", "beige": "#F4F2EC" }
+  "brand": {
+    "green": "#157061",
+    "greenDark": "#0F4D43",
+    "greenDeep": "#0A332D",
+    "rust": "#B85C2E",
+    "beige": "#F4F2EC"
+  }
 }

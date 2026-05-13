@@ -11,30 +11,19 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <style>
   :root {
-    --bg: #0a1212;
-    --surface: #131c1c;
-    --surface-2: #1a2626;
-    --border: #243333;
-    --accent: #2e6464;
-    --accent-hi: #3d8585;
-    --accent-lo: #1f4444;
-    --text: #e6ecec;
-    --text-2: #94a3a3;
-    --text-dim: #5f7373;
-    --success: #4ade80;
-    --error: #f87171;
-    --radius: 14px;
-    --radius-sm: 10px;
-    --gap: 16px;
-    --safe-top: env(safe-area-inset-top, 0px);
-    --safe-bottom: env(safe-area-inset-bottom, 0px);
+    --bg: #0a1212; --surface: #131c1c; --surface-2: #1a2626; --border: #243333;
+    --accent: #2e6464; --accent-hi: #3d8585; --accent-lo: #1f4444;
+    --text: #e6ecec; --text-2: #94a3a3; --text-dim: #5f7373;
+    --success: #4ade80; --error: #f87171;
+    --radius: 14px; --radius-sm: 10px;
+    --safe-top: env(safe-area-inset-top, 0px); --safe-bottom: env(safe-area-inset-bottom, 0px);
   }
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   html, body { margin: 0; padding: 0; background: var(--bg); color: var(--text);
     font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", system-ui, sans-serif;
     font-size: 16px; line-height: 1.5; min-height: 100vh; overscroll-behavior-y: contain; }
   body { padding: calc(var(--safe-top) + 12px) 16px calc(var(--safe-bottom) + 24px); max-width: 720px; margin: 0 auto; }
-  header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; padding-bottom: 14px; border-bottom: 1px solid var(--border); }
+  header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; padding-bottom: 14px; border-bottom: 1px solid var(--border); }
   .brand { display: flex; align-items: center; gap: 10px; }
   .brand-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 12px var(--accent); }
   .brand-name { font-weight: 600; letter-spacing: 0.5px; font-size: 14px; color: var(--text-2); }
@@ -42,6 +31,25 @@
   .status-pill { font-size: 11px; padding: 4px 10px; border-radius: 999px; background: var(--surface); color: var(--text-dim); border: 1px solid var(--border); }
   .status-pill.online { color: var(--success); }
   .status-pill.error { color: var(--error); }
+
+  /* Deal 1 banner */
+  .deal1-banner {
+    display: block; width: 100%;
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent-lo) 100%);
+    border: 1px solid var(--accent-hi);
+    border-radius: var(--radius);
+    padding: 18px 20px; margin-bottom: 20px;
+    text-align: left; text-decoration: none; color: var(--text);
+    cursor: pointer; transition: transform 0.15s, box-shadow 0.15s;
+    box-shadow: 0 4px 20px rgba(46, 100, 100, 0.25);
+  }
+  .deal1-banner:hover, .deal1-banner:focus { transform: translateY(-1px); box-shadow: 0 6px 28px rgba(46, 100, 100, 0.35); outline: none; }
+  .deal1-banner-label { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: rgba(255,255,255,0.75); }
+  .deal1-banner-days { font-size: 42px; font-weight: 800; line-height: 1; margin: 6px 0; font-variant-numeric: tabular-nums; }
+  .deal1-banner-days small { font-size: 16px; font-weight: 500; opacity: 0.75; margin-left: 6px; }
+  .deal1-banner-title { font-size: 14px; color: rgba(255,255,255,0.85); }
+  .deal1-banner-arrow { float: right; font-size: 20px; opacity: 0.6; margin-top: -4px; }
+
   .date-nav { display: flex; align-items: center; justify-content: space-between; gap: 8px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 8px; margin-bottom: 20px; }
   .date-nav button { min-width: 44px; min-height: 44px; background: transparent; border: none; color: var(--text); font-size: 20px; cursor: pointer; border-radius: var(--radius-sm); transition: background 0.15s; }
   .date-nav button:hover, .date-nav button:focus { background: var(--surface-2); outline: none; }
@@ -51,18 +59,8 @@
   .date-picker-input { position: absolute; opacity: 0; pointer-events: none; }
   .section-title { display: flex; align-items: center; justify-content: space-between; font-size: 13px; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text-2); margin: 24px 0 10px; }
   .section-title-accent { color: var(--accent-hi); }
-  .weight-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px; }
-  .weight-row { display: flex; gap: 10px; align-items: center; }
-  .weight-input { flex: 1; background: var(--bg); color: var(--text); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 14px 16px; font-size: 18px; font-weight: 600; font-variant-numeric: tabular-nums; min-height: 48px; -webkit-appearance: none; }
-  .weight-input:focus { outline: none; border-color: var(--accent); }
-  .btn { background: var(--accent); color: white; border: none; border-radius: var(--radius-sm); padding: 14px 20px; font-size: 15px; font-weight: 600; cursor: pointer; min-height: 48px; transition: background 0.15s; }
-  .btn:hover, .btn:focus { background: var(--accent-hi); outline: none; }
-  .btn:disabled { opacity: 0.5; cursor: not-allowed; }
-  .chart-wrap { margin-top: 16px; height: 180px; position: relative; }
-  .chart-stats { display: flex; justify-content: space-between; font-size: 12px; color: var(--text-2); margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border); font-variant-numeric: tabular-nums; }
-  .chart-stats strong { color: var(--text); font-weight: 600; }
-  .chart-stats .delta-down { color: var(--success); }
-  .chart-stats .delta-up { color: var(--error); }
+
+  /* Journal cards */
   .journal-grid { display: grid; gap: 12px; grid-template-columns: 1fr; }
   .journal-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
   .journal-head { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px 6px; }
@@ -75,18 +73,39 @@
   .journal-textarea { width: 100%; min-height: 90px; background: transparent; border: none; color: var(--text); font-family: inherit; font-size: 15px; line-height: 1.55; padding: 8px 16px 14px; resize: vertical; -webkit-appearance: none; }
   .journal-textarea:focus { outline: none; }
   .journal-foot { display: flex; justify-content: flex-end; padding: 0 12px 12px; gap: 8px; }
+  .btn { background: var(--accent); color: white; border: none; border-radius: var(--radius-sm); padding: 14px 20px; font-size: 15px; font-weight: 600; cursor: pointer; min-height: 48px; transition: background 0.15s; }
+  .btn:hover, .btn:focus { background: var(--accent-hi); outline: none; }
+  .btn:disabled { opacity: 0.5; cursor: not-allowed; }
   .btn-sm { padding: 8px 14px; font-size: 13px; min-height: 36px; border-radius: 8px; }
+
+  /* Weight */
+  .weight-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px; }
+  .weight-row { display: flex; gap: 10px; align-items: center; }
+  .weight-input { flex: 1; background: var(--bg); color: var(--text); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 14px 16px; font-size: 18px; font-weight: 600; font-variant-numeric: tabular-nums; min-height: 48px; -webkit-appearance: none; }
+  .weight-input:focus { outline: none; border-color: var(--accent); }
+  .chart-wrap { margin-top: 16px; height: 180px; position: relative; }
+  .chart-stats { display: flex; justify-content: space-between; font-size: 12px; color: var(--text-2); margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border); font-variant-numeric: tabular-nums; }
+  .chart-stats strong { color: var(--text); font-weight: 600; }
+  .chart-stats .delta-down { color: var(--success); }
+  .chart-stats .delta-up { color: var(--error); }
+
+  /* Milestones */
   .goals-strip { margin-top: 28px; padding-top: 18px; border-top: 1px solid var(--border); }
   .goals-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
-  .goal-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 12px 14px; }
-  .goal-label { font-size: 11px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.6px; }
+  .goal-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 14px; cursor: pointer; transition: background 0.15s, border-color 0.15s, transform 0.1s; text-align: left; color: var(--text); font-family: inherit; }
+  .goal-card:hover, .goal-card:focus { background: var(--surface-2); border-color: var(--accent); outline: none; }
+  .goal-card:active { transform: scale(0.98); }
+  .goal-label { font-size: 11px; color: var(--accent-hi); text-transform: uppercase; letter-spacing: 0.6px; font-weight: 600; }
   .goal-value { font-size: 22px; font-weight: 700; margin-top: 4px; font-variant-numeric: tabular-nums; }
-  .goal-sub { font-size: 11px; color: var(--text-2); margin-top: 2px; }
+  .goal-value small { font-size: 13px; color: var(--text-2); font-weight: 500; }
+  .goal-sub { font-size: 11px; color: var(--text-2); margin-top: 2px; line-height: 1.4; }
+  .goal-arrow { float: right; color: var(--text-dim); font-size: 14px; margin-top: -2px; }
+
   footer { margin-top: 32px; padding-top: 16px; border-top: 1px solid var(--border); font-size: 11px; color: var(--text-dim); text-align: center; }
   footer a { color: var(--text-2); text-decoration: none; }
   .banner { background: var(--accent-lo); color: var(--text); border: 1px solid var(--accent); border-radius: var(--radius-sm); padding: 10px 14px; font-size: 13px; margin-bottom: 14px; display: none; }
   .banner.show { display: block; }
-  .banner.error { background: rgba(248, 113, 113, 0.15); border-color: var(--error); }
+  .banner.error { background: rgba(248,113,113,0.15); border-color: var(--error); }
   @media (min-width: 600px) { .journal-grid { grid-template-columns: 1fr 1fr; } }
 </style>
 </head>
@@ -101,7 +120,16 @@
   </div>
   <div class="status-pill" id="status-pill">connecting…</div>
 </header>
+
 <div class="banner" id="banner"></div>
+
+<a href="roadmap.html?key=deal1" class="deal1-banner" id="deal1-banner">
+  <span class="deal1-banner-arrow">→</span>
+  <div class="deal1-banner-label">Deal 1 · First Spec Home</div>
+  <div class="deal1-banner-days"><span id="deal1-days">—</span><small>days to go</small></div>
+  <div class="deal1-banner-title" id="deal1-target-date">target —</div>
+</a>
+
 <nav class="date-nav">
   <button id="prev-day" aria-label="Previous day">←</button>
   <div class="date-display" id="date-display" tabindex="0" role="button" aria-label="Pick date">
@@ -111,6 +139,12 @@
   <button id="next-day" aria-label="Next day">→</button>
   <input type="date" class="date-picker-input" id="date-picker">
 </nav>
+
+<section>
+  <div class="section-title"><span>Journal</span></div>
+  <div class="journal-grid" id="journal-grid"></div>
+</section>
+
 <section>
   <div class="section-title"><span>Weight</span><span class="section-title-accent" id="weight-today-display"></span></div>
   <div class="weight-card">
@@ -126,15 +160,14 @@
     </div>
   </div>
 </section>
-<section>
-  <div class="section-title"><span>Journal</span></div>
-  <div class="journal-grid" id="journal-grid"></div>
-</section>
+
 <section class="goals-strip">
   <div class="section-title"><span>Milestones</span></div>
   <div class="goals-grid" id="goals-grid"></div>
 </section>
+
 <footer><a href="../index.html">← v1 dashboard</a> · last sync <span id="last-sync">—</span></footer>
+
 <script>
 (() => {
   const REPO = "greenerconcepts/apollo-memory";
@@ -145,15 +178,16 @@
   const API = "https://api.github.com/repos/" + REPO + "/contents/";
   const GOAL_WEIGHT = 175;
   const JOURNAL_TYPES = [
-    { key: "personal", label: "Personal" },
-    { key: "business", label: "Business" },
-    { key: "ideas", label: "Ideas" },
-    { key: "fitness", label: "Fitness" }
+    { key: "spiritual", label: "Spiritual" },
+    { key: "personal",  label: "Personal" },
+    { key: "business",  label: "Business" },
+    { key: "fitness",   label: "Fitness" }
   ];
   const todayStr = () => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`; };
   const addDays = (s, n) => { const [y,m,d] = s.split("-").map(Number); const dt = new Date(y, m-1, d); dt.setDate(dt.getDate() + n); return `${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,"0")}-${String(dt.getDate()).padStart(2,"0")}`; };
   const daysBetween = (a, b) => { const [ay,am,ad] = a.split("-").map(Number); const [by,bm,bd] = b.split("-").map(Number); return Math.round((new Date(by, bm-1, bd) - new Date(ay, am-1, ad)) / 86400000); };
   const fmtDateLong = (s) => { const [y,m,d] = s.split("-").map(Number); return new Date(y, m-1, d).toLocaleDateString(undefined, { weekday: "long", month: "short", day: "numeric" }); };
+  const fmtDateShort = (s) => { const [y,m,d] = s.split("-").map(Number); return new Date(y, m-1, d).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" }); };
   const relativeLabel = (s) => { const diff = daysBetween(s, todayStr()); if (diff === 0) return "Today"; if (diff === 1) return "Tomorrow"; if (diff === -1) return "Yesterday"; if (diff > 0) return `+${diff} days`; return `${diff} days`; };
   const b64enc = (str) => btoa(unescape(encodeURIComponent(str)));
   const b64dec = (str) => decodeURIComponent(escape(atob(str.replace(/\s/g, ""))));
@@ -173,11 +207,10 @@
     const j = await r.json();
     return j.content.sha;
   }
-  const state = { currentDate: todayStr(), journals: {}, weights: { entries: [], sha: null }, online: true };
+  const state = { currentDate: todayStr(), journals: {}, weights: { entries: [], sha: null } };
   const $ = (id) => document.getElementById(id);
   const grid = $("journal-grid");
   function setOnline(ok, msg) {
-    state.online = ok;
     $("status-pill").textContent = ok ? "online" : "offline";
     $("status-pill").className = "status-pill " + (ok ? "online" : "error");
     const b = $("banner");
@@ -334,19 +367,28 @@
   });
   async function loadMilestones() {
     let profile = { milestones: [
-      { key: "deal1", label: "Deal 1", date: "2026-12-25", name: "First spec home" },
-      { key: "deal2", label: "Deal 2", date: "2027-08-15", name: "Second spec" },
-      { key: "compound", label: "Compound", date: "2032-02-25", name: "Family compound" }
+      { key: "deal1",    label: "Deal 1",    date: "2026-12-25", name: "First spec home" },
+      { key: "credit",   label: "Credit",    date: "2026-10-01", name: "Credit score ready" },
+      { key: "deal2",    label: "Deal 2",    date: "2027-08-15", name: "Second spec" },
+      { key: "compound", label: "Compound",  date: "2032-02-25", name: "Family compound" }
     ]};
     try { const res = await ghGet("data/profile.json"); if (res) profile = JSON.parse(res.content); } catch (e) { console.error(e); }
+    // Deal 1 banner
+    const d1 = profile.milestones.find(m => m.key === "deal1");
+    if (d1) {
+      $("deal1-days").textContent = Math.max(0, daysBetween(todayStr(), d1.date));
+      $("deal1-target-date").textContent = `target ${fmtDateShort(d1.date)}`;
+    }
+    // Milestones grid (all of them, deal1 included so the link is consistent)
     const g = $("goals-grid");
     g.innerHTML = "";
     for (const m of profile.milestones) {
       const days = daysBetween(todayStr(), m.date);
-      const card = document.createElement("div");
-      card.className = "goal-card";
-      card.innerHTML = `<div class="goal-label">${m.label}</div><div class="goal-value">${days}<span style="font-size:13px;color:var(--text-2);font-weight:500"> days</span></div><div class="goal-sub">${m.name}</div>`;
-      g.appendChild(card);
+      const btn = document.createElement("a");
+      btn.className = "goal-card";
+      btn.href = `roadmap.html?key=${encodeURIComponent(m.key)}`;
+      btn.innerHTML = `<span class="goal-arrow">→</span><div class="goal-label">${m.label}</div><div class="goal-value">${days}<small> days</small></div><div class="goal-sub">${m.name}</div>`;
+      g.appendChild(btn);
     }
   }
   async function boot() {

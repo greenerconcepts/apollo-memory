@@ -1,0 +1,23 @@
+{
+  "title": "Family Compound — 45th Birthday",
+  "target_date": "2032-02-25",
+  "status": "vision",
+  "summary": "Four homes on shared land for Max + wife, two daughters' future homes, and in-laws. Target completion by Max's 45th birthday in 2032. Long horizon. Funded by spec-home profits and ongoing GCC cash flow.",
+  "phases": [
+    { "label": "Land acquired (target acreage, zoning, geo TBD)", "done": false },
+    { "label": "Master site plan drafted (lot positions, utilities, shared infrastructure)", "done": false },
+    { "label": "Home 1 (Max + wife) — designed", "done": false },
+    { "label": "Home 1 built", "done": false },
+    { "label": "Home 2 (in-laws or daughter) — built", "done": false },
+    { "label": "Home 3 — built", "done": false },
+    { "label": "Home 4 — built", "done": false }
+  ],
+  "action_items": [
+    { "label": "Geographic shortlist (North Fulton vs. exurban vs. mountains)", "done": false },
+    { "label": "Talk to wife about her must-haves", "done": false },
+    { "label": "Identify target acreage (5 acres? 20? 50?)", "done": false },
+    { "label": "Research land use, septic, well requirements for target areas", "done": false }
+  ],
+  "risks": "Six-year horizon. Family priorities will shift. Daughters' preferences as they hit teens. Keep the vision but don't over-engineer the plan yet.",
+  "notes": "Funded by stacking Deal 1 + Deal 2 + Deal 3+ profits, plus ongoing GCC. Don't lock in specifics until Deal 1 proves the business model works."
+}

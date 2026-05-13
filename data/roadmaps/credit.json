@@ -1,0 +1,22 @@
+{
+  "title": "Credit Score — Construction Loan Ready",
+  "target_date": "2026-10-01",
+  "status": "unknown",
+  "summary": "Hit a credit score that secures the best construction loan terms for Deal 1. Most construction lenders want 720+; best rates open up at 760+. Target 760+ by October 2026 so Deal 1 financing isn't constrained.",
+  "phases": [
+    { "label": "Pull current scores from all 3 bureaus (Experian, Equifax, TransUnion)", "done": false },
+    { "label": "Dispute any errors, freeze unauthorized inquiries", "done": false },
+    { "label": "Reach 720 (lender entry threshold)", "done": false },
+    { "label": "Reach 760 (best-rate threshold)", "done": false },
+    { "label": "Maintain through Deal 1 underwriting", "done": false }
+  ],
+  "action_items": [
+    { "label": "Pull free reports at annualcreditreport.com", "done": false },
+    { "label": "Confirm utilization < 30% on all revolving lines", "done": false },
+    { "label": "Set autopay on every account", "done": false },
+    { "label": "Avoid opening new credit lines 6 months before Deal 1 application", "done": false },
+    { "label": "Get a credit-monitoring tool (Credit Karma free or Experian premium)", "done": false }
+  ],
+  "risks": "Hard inquiries from shopping loans can dip score 5-10 points. Cluster all lender shopping in a 14-day window so FICO counts them as one. Riley legal could trigger a collection or judgment that wrecks score — close that loop before it escalates.",
+  "notes": "Max to fill in current score and target lender's minimum once known."
+}
