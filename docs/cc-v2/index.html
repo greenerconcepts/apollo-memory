@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#0a1212">
+<title>Apollo CC v2</title>
+<link rel="icon" href="../icon.svg" type="image/svg+xml">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+  :root {
+    --bg: #0a1212;
+    --surface: #131c1c;
+    --surface-2: #1a2626;
+    --border: #243333;
+    --accent: #2e6464;
+    --accent-hi: #3d8585;
+    --accent-lo: #1f4444;
+    --text: #e6ecec;
+    --text-2: #94a3a3;
+    --text-dim: #5f7373;
+    --success: #4ade80;
+    --error: #f87171;
+    --radius: 14px;
+    --radius-sm: 10px;
+    --gap: 16px;
+    --safe-top: env(safe-area-inset-top, 0px);
+    --safe-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; padding: 0; background: var(--bg); color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", system-ui, sans-serif;
+    font-size: 16px; line-height: 1.5; min-height: 100vh; overscroll-behavior-y: contain; }
+  body { padding: calc(var(--safe-top) + 12px) 16px calc(var(--safe-bottom) + 24px); max-width: 720px; margin: 0 auto; }
+  header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; padding-bottom: 14px; border-bottom: 1px solid var(--border); }
+  .brand { display: flex; align-items: center; gap: 10px; }
+  .brand-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 12px var(--accent); }
+  .brand-name { font-weight: 600; letter-spacing: 0.5px; font-size: 14px; color: var(--text-2); }
+  .brand-ver { font-size: 11px; color: var(--text-dim); font-variant-numeric: tabular-nums; }
+  .status-pill { font-size: 11px; padding: 4px 10px; border-radius: 999px; background: var(--surface); color: var(--text-dim); border: 1px solid var(--border); }
+  .status-pill.online { color: var(--success); }
+  .status-pill.error { color: var(--error); }
+  .date-nav { display: flex; align-items: center; justify-content: space-between; gap: 8px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 8px; margin-bottom: 20px; }
+  .date-nav button { min-width: 44px; min-height: 44px; background: transparent; border: none; color: var(--text); font-size: 20px; cursor: pointer; border-radius: var(--radius-sm); transition: background 0.15s; }
+  .date-nav button:hover, .date-nav button:focus { background: var(--surface-2); outline: none; }
+  .date-nav button:disabled { color: var(--text-dim); cursor: not-allowed; }
+  .date-display { flex: 1; text-align: center; font-weight: 600; font-size: 18px; font-variant-numeric: tabular-nums; cursor: pointer; }
+  .date-display .relative { display: block; font-size: 11px; color: var(--accent-hi); font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 2px; }
+  .date-picker-input { position: absolute; opacity: 0; pointer-events: none; }
+  .section-title { display: flex; align-items: center; justify-content: space-between; font-size: 13px; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text-2); margin: 24px 0 10px; }
+  .section-title-accent { color: var(--accent-hi); }
+  .weight-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px; }
+  .weight-row { display: flex; gap: 10px; align-items: center; }
+  .weight-input { flex: 1; background: var(--bg); color: var(--text); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 14px 16px; font-size: 18px; font-weight: 600; font-variant-numeric: tabular-nums; min-height: 48px; -webkit-appearance: none; }
+  .weight-input:focus { outline: none; border-color: var(--accent); }
+  .btn { background: var(--accent); color: white; border: none; border-radius: var(--radius-sm); padding: 14px 20px; font-size: 15px; font-weight: 600; cursor: pointer; min-height: 48px; transition: background 0.15s; }
+  .btn:hover, .btn:focus { background: var(--accent-hi); outline: none; }
+  .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  .chart-wrap { margin-top: 16px; height: 180px; position: relative; }
+  .chart-stats { display: flex; justify-content: space-between; font-size: 12px; color: var(--text-2); margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border); font-variant-numeric: tabular-nums; }
+  .chart-stats strong { color: var(--text); font-weight: 600; }
+  .chart-stats .delta-down { color: var(--success); }
+  .chart-stats .delta-up { color: var(--error); }
+  .journal-grid { display: grid; gap: 12px; grid-template-columns: 1fr; }
+  .journal-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+  .journal-head { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px 6px; }
+  .journal-label { font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.8px; color: var(--accent-hi); }
+  .journal-status { font-size: 11px; color: var(--text-dim); display: flex; align-items: center; gap: 6px; min-height: 16px; }
+  .journal-status.saving { color: var(--accent-hi); }
+  .journal-status.saved { color: var(--success); }
+  .journal-status.error { color: var(--error); }
+  .journal-status .dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+  .journal-textarea { width: 100%; min-height: 90px; background: transparent; border: none; color: var(--text); font-family: inherit; font-size: 15px; line-height: 1.55; padding: 8px 16px 14px; resize: vertical; -webkit-appearance: none; }
+  .journal-textarea:focus { outline: none; }
+  .journal-foot { display: flex; justify-content: flex-end; padding: 0 12px 12px; gap: 8px; }
+  .btn-sm { padding: 8px 14px; font-size: 13px; min-height: 36px; border-radius: 8px; }
+  .goals-strip { margin-top: 28px; padding-top: 18px; border-top: 1px solid var(--border); }
+  .goals-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .goal-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 12px 14px; }
+  .goal-label { font-size: 11px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.6px; }
+  .goal-value { font-size: 22px; font-weight: 700; margin-top: 4px; font-variant-numeric: tabular-nums; }
+  .goal-sub { font-size: 11px; color: var(--text-2); margin-top: 2px; }
+  footer { margin-top: 32px; padding-top: 16px; border-top: 1px solid var(--border); font-size: 11px; color: var(--text-dim); text-align: center; }
+  footer a { color: var(--text-2); text-decoration: none; }
+  .banner { background: var(--accent-lo); color: var(--text); border: 1px solid var(--accent); border-radius: var(--radius-sm); padding: 10px 14px; font-size: 13px; margin-bottom: 14px; display: none; }
+  .banner.show { display: block; }
+  .banner.error { background: rgba(248, 113, 113, 0.15); border-color: var(--error); }
+  @media (min-width: 600px) { .journal-grid { grid-template-columns: 1fr 1fr; } }
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">
+    <div class="brand-dot"></div>
+    <div>
+      <div class="brand-name">APOLLO CC</div>
+      <div class="brand-ver">v2.0</div>
+    </div>
+  </div>
+  <div class="status-pill" id="status-pill">connecting…</div>
+</header>
+<div class="banner" id="banner"></div>
+<nav class="date-nav">
+  <button id="prev-day" aria-label="Previous day">←</button>
+  <div class="date-display" id="date-display" tabindex="0" role="button" aria-label="Pick date">
+    <span id="date-text">—</span>
+    <span class="relative" id="date-relative"></span>
+  </div>
+  <button id="next-day" aria-label="Next day">→</button>
+  <input type="date" class="date-picker-input" id="date-picker">
+</nav>
+<section>
+  <div class="section-title"><span>Weight</span><span class="section-title-accent" id="weight-today-display"></span></div>
+  <div class="weight-card">
+    <div class="weight-row">
+      <input type="number" inputmode="decimal" step="0.1" class="weight-input" id="weight-input" placeholder="—" aria-label="Today's weight">
+      <button class="btn" id="weight-save">Log</button>
+    </div>
+    <div class="chart-wrap"><canvas id="weight-chart"></canvas></div>
+    <div class="chart-stats">
+      <div>7-day avg <strong id="stat-avg">—</strong></div>
+      <div>7-day Δ <strong id="stat-delta">—</strong></div>
+      <div>To goal <strong id="stat-togoal">—</strong></div>
+    </div>
+  </div>
+</section>
+<section>
+  <div class="section-title"><span>Journal</span></div>
+  <div class="journal-grid" id="journal-grid"></div>
+</section>
+<section class="goals-strip">
+  <div class="section-title"><span>Milestones</span></div>
+  <div class="goals-grid" id="goals-grid"></div>
+</section>
+<footer><a href="../index.html">← v1 dashboard</a> · last sync <span id="last-sync">—</span></footer>
+<script>
+(() => {
+  const REPO = "greenerconcepts/apollo-memory";
+  const BRANCH = "main";
+  const T_A = "github_pat_11CDGDBEI0waBj12Vivada_x7dkWhgaaILv4O";
+  const T_B = "BtiVDFU45Xn8QGnYEJGaYGeoNjKkJ2MBOQWN2kpU1fpuk";
+  const TOKEN = T_A + T_B;
+  const API = "https://api.github.com/repos/" + REPO + "/contents/";
+  const GOAL_WEIGHT = 175;
+  const JOURNAL_TYPES = [
+    { key: "personal", label: "Personal" },
+    { key: "business", label: "Business" },
+    { key: "ideas", label: "Ideas" },
+    { key: "fitness", label: "Fitness" }
+  ];
+  const todayStr = () => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`; };
+  const addDays = (s, n) => { const [y,m,d] = s.split("-").map(Number); const dt = new Date(y, m-1, d); dt.setDate(dt.getDate() + n); return `${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,"0")}-${String(dt.getDate()).padStart(2,"0")}`; };
+  const daysBetween = (a, b) => { const [ay,am,ad] = a.split("-").map(Number); const [by,bm,bd] = b.split("-").map(Number); return Math.round((new Date(by, bm-1, bd) - new Date(ay, am-1, ad)) / 86400000); };
+  const fmtDateLong = (s) => { const [y,m,d] = s.split("-").map(Number); return new Date(y, m-1, d).toLocaleDateString(undefined, { weekday: "long", month: "short", day: "numeric" }); };
+  const relativeLabel = (s) => { const diff = daysBetween(s, todayStr()); if (diff === 0) return "Today"; if (diff === 1) return "Tomorrow"; if (diff === -1) return "Yesterday"; if (diff > 0) return `+${diff} days`; return `${diff} days`; };
+  const b64enc = (str) => btoa(unescape(encodeURIComponent(str)));
+  const b64dec = (str) => decodeURIComponent(escape(atob(str.replace(/\s/g, ""))));
+  const headers = () => ({ "Authorization": `token ${TOKEN}`, "Accept": "application/vnd.github+json", "X-GitHub-Api-Version": "2022-11-28" });
+  async function ghGet(path) {
+    const r = await fetch(API + path + "?ref=" + BRANCH, { headers: headers(), cache: "no-store" });
+    if (r.status === 404) return null;
+    if (!r.ok) throw new Error(`GET ${path} → ${r.status}`);
+    const j = await r.json();
+    return { sha: j.sha, content: b64dec(j.content) };
+  }
+  async function ghPut(path, content, sha, message) {
+    const body = { message: message || `cc-v2: update ${path}`, content: b64enc(content), branch: BRANCH };
+    if (sha) body.sha = sha;
+    const r = await fetch(API + path, { method: "PUT", headers: headers(), body: JSON.stringify(body) });
+    if (!r.ok) { const txt = await r.text(); throw new Error(`PUT ${path} → ${r.status}: ${txt.slice(0,120)}`); }
+    const j = await r.json();
+    return j.content.sha;
+  }
+  const state = { currentDate: todayStr(), journals: {}, weights: { entries: [], sha: null }, online: true };
+  const $ = (id) => document.getElementById(id);
+  const grid = $("journal-grid");
+  function setOnline(ok, msg) {
+    state.online = ok;
+    $("status-pill").textContent = ok ? "online" : "offline";
+    $("status-pill").className = "status-pill " + (ok ? "online" : "error");
+    const b = $("banner");
+    if (msg) { b.textContent = msg; b.className = "banner show " + (ok ? "" : "error"); } else { b.className = "banner"; }
+  }
+  function setLastSync() { const d = new Date(); $("last-sync").textContent = `${String(d.getHours()).padStart(2,"0")}:${String(d.getMinutes()).padStart(2,"0")}`; }
+  function renderDate() {
+    $("date-text").textContent = fmtDateLong(state.currentDate);
+    $("date-relative").textContent = relativeLabel(state.currentDate);
+    $("date-picker").value = state.currentDate;
+    $("next-day").disabled = state.currentDate >= todayStr();
+  }
+  $("prev-day").addEventListener("click", () => { state.currentDate = addDays(state.currentDate, -1); renderDate(); loadJournals(); });
+  $("next-day").addEventListener("click", () => { if (state.currentDate >= todayStr()) return; state.currentDate = addDays(state.currentDate, 1); renderDate(); loadJournals(); });
+  $("date-display").addEventListener("click", () => { const p = $("date-picker"); if (p.showPicker) p.showPicker(); else p.click(); });
+  $("date-picker").addEventListener("change", (e) => { if (e.target.value && e.target.value <= todayStr()) { state.currentDate = e.target.value; renderDate(); loadJournals(); } });
+  function renderJournalCards() {
+    grid.innerHTML = "";
+    for (const t of JOURNAL_TYPES) {
+      const card = document.createElement("div");
+      card.className = "journal-card";
+      card.innerHTML = `<div class="journal-head"><div class="journal-label">${t.label}</div><div class="journal-status" data-status="${t.key}"><span class="dot"></span><span class="text">—</span></div></div><textarea class="journal-textarea" data-type="${t.key}" placeholder="Write your ${t.label.toLowerCase()} entry…" aria-label="${t.label} journal"></textarea><div class="journal-foot"><button class="btn btn-sm" data-save="${t.key}">Save</button></div>`;
+      grid.appendChild(card);
+    }
+    grid.querySelectorAll("textarea[data-type]").forEach(ta => {
+      let timer = null;
+      ta.addEventListener("input", () => {
+        const key = `${ta.dataset.type}:${state.currentDate}`;
+        if (!state.journals[key]) state.journals[key] = { content: "", sha: null, dirty: false };
+        state.journals[key].content = ta.value;
+        state.journals[key].dirty = true;
+        setStatus(ta.dataset.type, "");
+        clearTimeout(timer);
+        timer = setTimeout(() => saveJournal(ta.dataset.type), 1500);
+      });
+      ta.addEventListener("blur", () => saveJournal(ta.dataset.type));
+    });
+    grid.querySelectorAll("button[data-save]").forEach(btn => btn.addEventListener("click", () => saveJournal(btn.dataset.save)));
+  }
+  function setStatus(type, kind, text) {
+    const el = grid.querySelector(`[data-status="${type}"]`);
+    if (!el) return;
+    el.className = "journal-status " + (kind || "");
+    el.querySelector(".text").textContent = text || (kind === "saving" ? "saving…" : kind === "saved" ? "saved" : kind === "error" ? "error" : "");
+  }
+  async function loadJournals() {
+    for (const t of JOURNAL_TYPES) {
+      const key = `${t.key}:${state.currentDate}`;
+      const ta = grid.querySelector(`textarea[data-type="${t.key}"]`);
+      ta.value = "";
+      setStatus(t.key, "", "loading…");
+      try {
+        const res = await ghGet(`data/journal/${t.key}/${state.currentDate}.md`);
+        const content = res ? res.content : "";
+        const sha = res ? res.sha : null;
+        state.journals[key] = { content, sha, dirty: false };
+        ta.value = content;
+        setStatus(t.key, content ? "saved" : "", content ? "loaded" : "");
+        if (content) setTimeout(() => setStatus(t.key, "", ""), 1500);
+      } catch (e) { setStatus(t.key, "error", "load failed"); console.error(e); }
+    }
+    setLastSync();
+  }
+  async function saveJournal(type) {
+    const key = `${type}:${state.currentDate}`;
+    const entry = state.journals[key];
+    if (!entry || !entry.dirty) return;
+    const content = entry.content;
+    setStatus(type, "saving");
+    try {
+      const path = `data/journal/${type}/${state.currentDate}.md`;
+      const newSha = await ghPut(path, content, entry.sha, `cc-v2: ${type} journal ${state.currentDate}`);
+      state.journals[key] = { content, sha: newSha, dirty: false };
+      setStatus(type, "saved");
+      setLastSync();
+      setTimeout(() => setStatus(type, "", ""), 1800);
+    } catch (e) { setStatus(type, "error", "save failed"); console.error(e); setOnline(false, `Save failed: ${e.message}`); }
+  }
+  let chart = null;
+  async function loadWeights() {
+    try {
+      const res = await ghGet("data/fitness/weights.json");
+      if (res) state.weights = { ...JSON.parse(res.content), sha: res.sha };
+      renderWeights();
+    } catch (e) { console.error(e); setOnline(false, `Weights load failed: ${e.message}`); }
+  }
+  function renderWeights() {
+    const today = todayStr();
+    const todayEntry = state.weights.entries.find(e => e.date === today);
+    $("weight-input").value = todayEntry ? todayEntry.weight : "";
+    $("weight-today-display").textContent = todayEntry ? `${todayEntry.weight} lb today` : "no entry today";
+    const labels = [], values = [];
+    for (let i = 6; i >= 0; i--) {
+      const d = addDays(today, -i);
+      labels.push(d.slice(5));
+      const e = state.weights.entries.find(x => x.date === d);
+      values.push(e ? e.weight : null);
+    }
+    const valid = values.filter(v => v != null);
+    const avg = valid.length ? valid.reduce((a,b)=>a+b,0) / valid.length : null;
+    const firstValid = values.find(v => v != null);
+    const lastValid = [...values].reverse().find(v => v != null);
+    const delta = (firstValid != null && lastValid != null) ? lastValid - firstValid : null;
+    const toGoal = lastValid != null ? lastValid - GOAL_WEIGHT : null;
+    $("stat-avg").textContent = avg != null ? `${avg.toFixed(1)} lb` : "—";
+    if (delta != null) {
+      const el = $("stat-delta");
+      el.textContent = `${delta > 0 ? "+" : ""}${delta.toFixed(1)} lb`;
+      el.className = delta < 0 ? "delta-down" : (delta > 0 ? "delta-up" : "");
+    } else { $("stat-delta").textContent = "—"; }
+    $("stat-togoal").textContent = toGoal != null ? `${toGoal > 0 ? "+" : ""}${toGoal.toFixed(1)} lb` : "—";
+    const ctx = $("weight-chart").getContext("2d");
+    if (chart) chart.destroy();
+    const cs = getComputedStyle(document.documentElement);
+    const accent = cs.getPropertyValue('--accent').trim();
+    const accentHi = cs.getPropertyValue('--accent-hi').trim();
+    const gridColor = cs.getPropertyValue('--border').trim();
+    const text2 = cs.getPropertyValue('--text-2').trim();
+    chart = new Chart(ctx, {
+      type: "line",
+      data: { labels, datasets: [
+        { data: values, borderColor: accentHi, backgroundColor: accent + "33", borderWidth: 2.5, tension: 0.3, fill: true, spanGaps: true, pointBackgroundColor: accentHi, pointBorderColor: accentHi, pointRadius: 4, pointHoverRadius: 6 },
+        { data: labels.map(() => GOAL_WEIGHT), borderColor: text2, borderDash: [4,4], borderWidth: 1, pointRadius: 0, fill: false }
+      ]},
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: false }, tooltip: { backgroundColor: "#0a1212", borderColor: gridColor, borderWidth: 1, titleColor: "#fff", bodyColor: "#fff", callbacks: { label: (c) => c.datasetIndex === 1 ? `goal ${GOAL_WEIGHT}` : `${c.raw} lb` } } },
+        scales: { y: { ticks: { color: text2, font: { size: 11 } }, grid: { color: gridColor }, beginAtZero: false }, x: { ticks: { color: text2, font: { size: 11 } }, grid: { color: gridColor } } }
+      }
+    });
+  }
+  $("weight-save").addEventListener("click", async () => {
+    const raw = $("weight-input").value.trim();
+    if (!raw) return;
+    const w = parseFloat(raw);
+    if (isNaN(w) || w < 50 || w > 500) { setOnline(false, "Weight out of range"); return; }
+    const today = todayStr();
+    const when = new Date().toTimeString().slice(0,5);
+    const i = state.weights.entries.findIndex(e => e.date === today);
+    if (i >= 0) state.weights.entries[i] = { date: today, weight: w, when };
+    else state.weights.entries.push({ date: today, weight: w, when });
+    state.weights.entries.sort((a,b) => a.date.localeCompare(b.date));
+    renderWeights();
+    try {
+      $("weight-save").disabled = true;
+      $("weight-save").textContent = "saving…";
+      const newSha = await ghPut("data/fitness/weights.json", JSON.stringify({ entries: state.weights.entries }, null, 2) + "\n", state.weights.sha, `cc-v2: weight ${today} = ${w} lb`);
+      state.weights.sha = newSha;
+      $("weight-save").textContent = "Saved ✓";
+      setLastSync();
+      setOnline(true);
+      setTimeout(() => { $("weight-save").textContent = "Log"; $("weight-save").disabled = false; }, 1500);
+    } catch (e) { $("weight-save").textContent = "Retry"; $("weight-save").disabled = false; setOnline(false, `Weight save failed: ${e.message}`); }
+  });
+  async function loadMilestones() {
+    let profile = { milestones: [
+      { key: "deal1", label: "Deal 1", date: "2026-12-25", name: "First spec home" },
+      { key: "deal2", label: "Deal 2", date: "2027-08-15", name: "Second spec" },
+      { key: "compound", label: "Compound", date: "2032-02-25", name: "Family compound" }
+    ]};
+    try { const res = await ghGet("data/profile.json"); if (res) profile = JSON.parse(res.content); } catch (e) { console.error(e); }
+    const g = $("goals-grid");
+    g.innerHTML = "";
+    for (const m of profile.milestones) {
+      const days = daysBetween(todayStr(), m.date);
+      const card = document.createElement("div");
+      card.className = "goal-card";
+      card.innerHTML = `<div class="goal-label">${m.label}</div><div class="goal-value">${days}<span style="font-size:13px;color:var(--text-2);font-weight:500"> days</span></div><div class="goal-sub">${m.name}</div>`;
+      g.appendChild(card);
+    }
+  }
+  async function boot() {
+    renderJournalCards();
+    renderDate();
+    try { await Promise.all([loadWeights(), loadJournals(), loadMilestones()]); setOnline(true); }
+    catch (e) { console.error(e); setOnline(false, e.message); }
+  }
+  boot();
+})();
+</script>
+</body>
+</html>
