@@ -1,14 +1,59 @@
 {
   "entries": [
-    { "date": "2026-05-04", "weight": 183.4, "when": "12:39" },
-    { "date": "2026-05-05", "weight": 182.0, "when": "22:25" },
-    { "date": "2026-05-06", "weight": 179.4, "when": "07:49" },
-    { "date": "2026-05-07", "weight": 181.6, "when": "backfill" },
-    { "date": "2026-05-08", "weight": 182.2, "when": "backfill" },
-    { "date": "2026-05-09", "weight": 181.0, "when": "backfill" },
-    { "date": "2026-05-10", "weight": 180.2, "when": "backfill" },
-    { "date": "2026-05-11", "weight": 179.0, "when": "backfill" },
-    { "date": "2026-05-12", "weight": 177.6, "when": "backfill" },
-    { "date": "2026-05-13", "weight": 178.1, "when": "backfill" }
+    {
+      "date": "2026-05-04",
+      "weight": 183.4,
+      "when": "12:39"
+    },
+    {
+      "date": "2026-05-05",
+      "weight": 182,
+      "when": "22:25"
+    },
+    {
+      "date": "2026-05-06",
+      "weight": 179.4,
+      "when": "07:49"
+    },
+    {
+      "date": "2026-05-07",
+      "weight": 181.6,
+      "when": "backfill"
+    },
+    {
+      "date": "2026-05-08",
+      "weight": 182.2,
+      "when": "backfill"
+    },
+    {
+      "date": "2026-05-09",
+      "weight": 181,
+      "when": "backfill"
+    },
+    {
+      "date": "2026-05-10",
+      "weight": 180.2,
+      "when": "backfill"
+    },
+    {
+      "date": "2026-05-11",
+      "weight": 179,
+      "when": "backfill"
+    },
+    {
+      "date": "2026-05-12",
+      "weight": 177.6,
+      "when": "backfill"
+    },
+    {
+      "date": "2026-05-13",
+      "weight": 178.1,
+      "when": "backfill"
+    },
+    {
+      "date": "2026-05-14",
+      "weight": 166.8,
+      "when": "06:35"
+    }
   ]
 }
