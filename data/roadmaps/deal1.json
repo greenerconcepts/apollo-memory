@@ -6,7 +6,7 @@
   "phases": [
     {
       "label": "Define ideal deal criteria (price, ARV, geo, lot size, build type)",
-      "done": true
+      "done": false
     },
     {
       "label": "Capital stack defined (cash + construction loan + equity partner if any)",
