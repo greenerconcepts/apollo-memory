@@ -4,24 +4,72 @@
   "status": "scouting",
   "summary": "Acquire land and build the first spec home as the entry point of the developer transition. The right deal, not the fast one. Don't rush a bad fit just to hit Christmas — the date is a north star, not a deadline that overrides judgment.",
   "phases": [
-    { "label": "Define ideal deal criteria (price, ARV, geo, lot size, build type)", "done": false },
-    { "label": "Capital stack defined (cash + construction loan + equity partner if any)", "done": false },
-    { "label": "Lender preapproval letter in hand", "done": false },
-    { "label": "Realtor / wholesaler network warmed up", "done": false },
-    { "label": "Lot under contract", "done": false },
-    { "label": "Permits + plans approved", "done": false },
-    { "label": "Foundation poured", "done": false },
-    { "label": "Dried in", "done": false },
-    { "label": "C of O", "done": false },
-    { "label": "Listed", "done": false },
-    { "label": "Sold", "done": false }
+    {
+      "label": "Define ideal deal criteria (price, ARV, geo, lot size, build type)",
+      "done": true
+    },
+    {
+      "label": "Capital stack defined (cash + construction loan + equity partner if any)",
+      "done": false
+    },
+    {
+      "label": "Lender preapproval letter in hand",
+      "done": false
+    },
+    {
+      "label": "Realtor / wholesaler network warmed up",
+      "done": false
+    },
+    {
+      "label": "Lot under contract",
+      "done": false
+    },
+    {
+      "label": "Permits + plans approved",
+      "done": false
+    },
+    {
+      "label": "Foundation poured",
+      "done": false
+    },
+    {
+      "label": "Dried in",
+      "done": false
+    },
+    {
+      "label": "C of O",
+      "done": false
+    },
+    {
+      "label": "Listed",
+      "done": false
+    },
+    {
+      "label": "Sold",
+      "done": false
+    }
   ],
   "action_items": [
-    { "label": "Write criteria one-pager (target price, ARV, neighborhood list, lot type)", "done": false },
-    { "label": "Call 3 construction lenders, compare terms", "done": false },
-    { "label": "Pull credit, confirm score meets lender thresholds", "done": false },
-    { "label": "Form deal-specific LLC", "done": false },
-    { "label": "Set up separate deal accounting (separate checking, books)", "done": false }
+    {
+      "label": "Write criteria one-pager (target price, ARV, neighborhood list, lot type)",
+      "done": false
+    },
+    {
+      "label": "Call 3 construction lenders, compare terms",
+      "done": false
+    },
+    {
+      "label": "Pull credit, confirm score meets lender thresholds",
+      "done": false
+    },
+    {
+      "label": "Form deal-specific LLC",
+      "done": false
+    },
+    {
+      "label": "Set up separate deal accounting (separate checking, books)",
+      "done": false
+    }
   ],
   "risks": "Cash flow. Salvucci #2765 funding the dev block this month — slip on that and Deal 1 capital tightens. Danny license situation means staffing every job costs Max more time. Riley legal could distract or eat cash if it goes badly.",
   "notes": "Tied to credit-score readiness (see credit roadmap). Deal 1 ships → lessons feed Deal 2 → Deal 2 + GCC profits feed the compound."
